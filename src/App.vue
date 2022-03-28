@@ -2,14 +2,37 @@
   <div class="container" :style="{ background: `url(${bg})` }">
     <div class="container-left"></div>
     <div class="container-center" id="china"></div>
-    <div class="container-right"></div>
+    <div class="container-right" style="color: white">
+      <table class="table" cellspacing="0" border="1">
+        <thead>
+          <tr>
+            <th>地区</th>
+            <th>新增确诊</th>
+            <th>累计确诊</th>
+            <th>治愈</th>
+            <th>死亡</th>
+          </tr>
+        </thead>
+        <transition-group
+          enter-active-class="animate__animated animate__fadeInRight"
+          tag="tbody"
+        >
+          <tr v-for="item in store.item" :key="item.name">
+            <td align="center">{{ item.name }}</td>
+            <td align="center">{{ item.today.confirm }}</td>
+            <td align="center">{{ item.total.confirm }}</td>
+            <td align="center">{{ item.total.heal }}</td>
+            <td align="center">{{ item.total.dead }}</td>
+          </tr>
+        </transition-group>
+      </table>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import bg from "./assets/bg.jpg"; // 导入背景图
 import { useCounterStore } from "./stores/counter"; // 导入疫情数据模块
-
 /**
  * 添加echarts需要一个dom元素
  * dom元素要在onMounted生命周期当中获取
@@ -17,17 +40,29 @@ import { useCounterStore } from "./stores/counter"; // 导入疫情数据模块
 import { onMounted } from "vue"; // 导入 vue 生命周期
 import * as echarts from "echarts"; // 导入 echarts  把所有api导出成一个对象（echarts 5）
 import "./assets/china.js"; // 导入地图 china.js
-import { geoCoordMap } from "./assets/geoMap";
+import { geoCoordMap } from "./assets/geoMap"; // 导入经纬度
+import "animate.css"; // 导入动画 animate.css
 
-const store = useCounterStore();
-// 挂载地图
+const store = useCounterStore(); // 调用方法 store
+/**
+ * 页面挂载时
+ */
 onMounted(async () => {
-  await store.getList(); //调用方法获取疫情数据
+  await store.getList(); //调用 store 获取疫情数据
+  initCharts(); // 插入图表
+});
+/**
+ * 封装函数 插入图表
+ */
+const initCharts = () => {
   const city = store.list.diseaseh5Shelf.areaTree[0].children;
+  store.item = city[4].children;
+  console.log(city);
   const data = city.map((v) => {
     return {
       name: v.name,
       value: geoCoordMap[v.name].concat(v.total.nowConfirm),
+      children: v.children,
     };
   });
   /**
@@ -101,7 +136,6 @@ onMounted(async () => {
     series: [
       {
         type: "map",
-        selectedMode: "multiple",
         map: "china",
         aspectScale: 0.8,
         layoutCenter: ["50%", "50%"], //地图位置
@@ -161,7 +195,13 @@ onMounted(async () => {
       },
     ],
   });
-});
+
+  // 封装方法 on  监听点击事件 click
+  charts.on("click", (e: any) => {
+    // console.log(e);
+    store.item = e.data.children;
+  });
+};
 </script>
 
 <style lang="less">
@@ -187,6 +227,21 @@ body,
   }
   &-right {
     width: 400px;
+  }
+}
+.table {
+  background: #2e2e2e;
+  width: 100%;
+  tr {
+    th {
+      padding: 5px;
+      white-space: nowrap; // 不能换行
+    }
+    td {
+      padding: 5px 10px;
+      white-space: nowrap;
+      width: 100px;
+    }
   }
 }
 </style>
