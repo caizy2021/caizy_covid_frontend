@@ -33,6 +33,7 @@
           <div>累计死亡</div>
         </section>
       </div>
+      <div class="container-left-pie"></div>
     </div>
     <div class="container-center" id="china"></div>
     <div class="container-right" style="color: white">
@@ -83,6 +84,7 @@ const store = useCounterStore(); // 调用方法 store
 onMounted(async () => {
   await store.getList(); //调用 store 获取疫情数据
   initCharts(); // 插入图表
+  initPie(); // 插入饼图
 });
 /**
  * 封装函数 插入图表
@@ -90,7 +92,7 @@ onMounted(async () => {
 const initCharts = () => {
   const city = store.list.diseaseh5Shelf.areaTree[0].children;
   store.item = city[4].children;
-  console.log(city);
+  // console.log(city);
   const data = city.map((v) => {
     return {
       name: v.name,
@@ -193,12 +195,19 @@ const initCharts = () => {
           //},
         },
         emphasis: {
-          areaColor: "#56b1da",
+          itemStyle: {
+            areaColor: "#56b1da",
+          },
           label: {
             show: true,
-            color: "#fff",
+            color: "#ff191d",
           },
         },
+        // select: {
+        //   itemStyle: {
+        //     areaColor: "#56b1da",
+        //   },
+        // },
         data: data,
       },
       {
@@ -221,7 +230,7 @@ const initCharts = () => {
         },
         itemStyle: {
           //normal: {
-          color: "#E4393C", //标志颜色
+          color: "#ff191d", //标志颜色
           //},
         },
         data: data,
@@ -235,12 +244,60 @@ const initCharts = () => {
     store.item = e.data.children;
   });
 };
+/**
+ * 封装函数 插入饼图
+ */
+const initPie = () => {
+  const charts = echarts.init(
+    document.querySelector(".container-left-pie") as HTMLElement
+  );
+  // console.log(store.cityDetail);
+  charts.setOption({
+    backgroundColor: "#0c3653",
+    tooltip: {
+      trigger: "item",
+    },
+    // legend: {
+    //   top: "5%",
+    //   left: "center",
+    // },
+    series: [
+      {
+        type: "pie",
+        radius: ["40%", "70%"],
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: "#fff",
+          borderWidth: 2,
+        },
+        label: {
+          show: true,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "14",
+          },
+        },
+        // labelLine: {
+        //   show: false,
+        // },
+        data: store.cityDetail.map((v) => {
+          return {
+            name: v.city,
+            value: v.nowConfirm,
+          };
+        }),
+      },
+    ],
+  });
+};
 </script>
 
 <style lang="less">
 @itemColor: #ff191d;
-@itemBg: #223651;
-@itemBorder: #212028;
+@itemBg: #0c3653;
+@itemBorder: #1cccff;
 * {
   padding: 0;
   margin: 0;
@@ -276,6 +333,10 @@ body,
         }
       }
     }
+    &-pie {
+      height: 350px;
+      margin-top: 20px;
+    }
   }
   &-center {
     flex: 1;
@@ -285,9 +346,10 @@ body,
   }
 }
 .table {
-  background: #2e2e2e;
+  background: @itemBg;
   width: 100%;
   tr {
+    border-color: @itemBorder;
     th {
       padding: 5px;
       white-space: nowrap; // 不能换行
