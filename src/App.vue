@@ -34,6 +34,7 @@
         </section>
       </div>
       <div class="container-left-pie"></div>
+      <div class="container-left-line"></div>
     </div>
     <div class="container-center" id="china"></div>
     <div class="container-right" style="color: white">
@@ -85,6 +86,7 @@ onMounted(async () => {
   await store.getList(); //调用 store 获取疫情数据
   initCharts(); // 插入图表
   initPie(); // 插入饼图
+  initLine(); // 插入折线图
 });
 /**
  * 封装函数 插入图表
@@ -292,6 +294,47 @@ const initPie = () => {
     ],
   });
 };
+/**
+ * 封装函数 插入折线图
+ */
+const initLine = () => {
+  const charts = echarts.init(
+    document.querySelector(".container-left-line") as HTMLElement
+  );
+  charts.setOption({
+    backgroundColor: "#0c3653",
+    tooltip: {
+      trigger: "axis",
+    },
+    xAxis: {
+      type: "category",
+      data: store.cityDetail.map((v) => v.city),
+      axisLine: {
+        lineStyle: {
+          color: "#fff",
+        },
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLine: {
+        lineStyle: {
+          color: "#fff",
+        },
+      },
+    },
+    label: {
+      show: true,
+    },
+    series: [
+      {
+        data: store.cityDetail.map((v) => v.nowConfirm),
+        type: "line",
+        smooth: true,
+      },
+    ],
+  });
+};
 </script>
 
 <style lang="less">
@@ -334,7 +377,11 @@ body,
       }
     }
     &-pie {
-      height: 350px;
+      height: 320px;
+      margin-top: 20px;
+    }
+    &-line {
+      height: 320px;
       margin-top: 20px;
     }
   }
