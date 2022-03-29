@@ -1,6 +1,39 @@
 <template>
   <div class="container" :style="{ background: `url(${bg})` }">
-    <div class="container-left"></div>
+    <div style="color: white" class="container-left">
+      <div class="container-left-card">
+        <section>
+          <div>较上日+ {{ store.chinaAdd.localConfirmH5 }}</div>
+          <div>{{ store.chinaTotal.localConfirm }}</div>
+          <div>本土现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.nowConfirm }}</div>
+          <div>{{ store.chinaTotal.nowConfirm }}</div>
+          <div>现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.confirm }}</div>
+          <div>{{ store.chinaTotal.confirm }}</div>
+          <div>累计确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.noInfect }}</div>
+          <div>{{ store.chinaTotal.noInfect }}</div>
+          <div>无症状感染者</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.importedCase }}</div>
+          <div>{{ store.chinaTotal.importedCase }}</div>
+          <div>境外输入</div>
+        </section>
+        <section>
+          <div>较上日+ {{ store.chinaAdd.dead }}</div>
+          <div>{{ store.chinaTotal.dead }}</div>
+          <div>累计死亡</div>
+        </section>
+      </div>
+    </div>
     <div class="container-center" id="china"></div>
     <div class="container-right" style="color: white">
       <table class="table" cellspacing="0" border="1">
@@ -205,6 +238,9 @@ const initCharts = () => {
 </script>
 
 <style lang="less">
+@itemColor: #ff191d;
+@itemBg: #223651;
+@itemBorder: #212028;
 * {
   padding: 0;
   margin: 0;
@@ -221,6 +257,25 @@ body,
   overflow: hidden;
   &-left {
     width: 400px;
+    &-card {
+      display: grid; // 栅格布局
+      grid-template-columns: auto auto auto; // 3列
+      grid-template-rows: auto auto auto; // 2行
+      section {
+        background: @itemBg;
+        border: 1px solid @itemBorder;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        div:nth-child(2) {
+          color: @itemColor;
+          padding: 10px 0;
+          font-weight: bolder;
+          font-size: 24px;
+        }
+      }
+    }
   }
   &-center {
     flex: 1;
